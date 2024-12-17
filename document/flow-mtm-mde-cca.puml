@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title CO1 create flow
+
+participant mtm2 #lightgreen
+participant mde
+participant cca
+''' 264 batch.getOrderProduct().getCustomer().getCustomerName()
+autonumber
+
+-> mtm2: batch
+mtm2 -> mde: {\n    "facility": ${[DB]SYSTEM_CONFIG["FACILITY"]},\n    "customerName",\n    "coNumber",\n    "folderTimestamp",\n    "isSystemSubmit": **true**\n}
+
+@enduml

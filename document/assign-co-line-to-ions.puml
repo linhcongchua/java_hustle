@@ -1,0 +1,69 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+-> m3coLineList,
+availableIONsList
+<color:red>reportedIONList</color>;
+
+:ReportFgService.assignCOLineToIONs();
+
+if (<color:red>reportedIONList</color> not empty?) is (yes) then
+  while (**loop** reportedION in reportedIONList ?)
+    :m3ColineReported = find in  **m3coLineList** have **CO** & **Coline** equal to reportedION;
+
+    if (m3ColineReported is empty) then (yes)
+      #pink:return error result;
+      note left
+      No CO line is found in M3 data
+      for already reported CO: {} and CO Line: {}
+      and Customer Order#: <customerOrderNo>.
+      end note
+      detach
+    else (no)
+      :reportedQty = reportedION.m3FgQuantity;
+
+      while (m3coLine in reportedIONList that have **CO** & **Coline** equal to reportedION)
+        if (reportedQty > 0 && m3coLine.orderedQuantity > m3coLine.consumptionQuantity ?) is (yes) then
+          :tempReportedQty += reportedQty;
+        else (no)
+          :tempReportedQty += m3coLine.orderedQuantity - m3coLine.consumptionQuantity;
+        endif
+
+        #lightgreen:m3coLine.consumptionQuantity += tempReportedQty;
+        :reportedQty -= tempReportedQty;
+      endwhile
+    endif
+
+  endwhile
+else (no)
+  :do nothing here;
+endif
+
+while (availableION in availableIONsList)
+    :fgReportQTY = availableION.quantity - availableION.reportQuantity;
+    while (m3coLine in reportedIONList)
+
+        if (**fgReportQTY > 0** && m3coLine.orderedQuantity > m3coLine.consumptionQuantity?) is (yes) then
+
+            :tempFGReportQty = **Math.min**(m3coLine.orderedQuantity - m3coLine.consumptionQuantity, fgReportQTY);
+          :fgReportQTY -= tempFGReportQty;
+        endif
+        note right
+            check if there is ion 's quantity need to be
+            assigned by another CO line
+        end note
+    endwhile
+
+    if (fgReportQTY still > 0) is (yes) then
+      #pink:return error result;
+      note right
+        No enough FG qty(Preallocation/ Allocation/ Picklist) in M3 for CO:
+        <co> and CO line: <coLine> and Customer Order#: <customerOrderNo> in GPL.
+      end note
+    endif
+endwhile
+
+stop
+
+@enduml

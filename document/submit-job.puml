@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+->submitJob/{facility}/{brandCode}/{m3CoNo}/{folderTimestamp}/{byUser}/{isSystemJob}
+    - facility
+    - brandCode
+    - m3CoNo
+    - folderTimestamp
+    - byUser
+    - isSystemJob;
+
+partition #lightgreen UpdateJobResource.submitJob {
+    :Validate non empty path params;
+    :Validate
+        - facility exist in DB
+        - brandCode exist in DB
+        - checkM3CONo
+        - checkM3Customer
+    ;
+    note
+    see **checkM3CONo below**
+    end note
+
+    :checkM3CONo;
+
+}
+stop
+
+
+
+
+' >>>> checkM3CONo
+start
+->facilityCode, m3cono;
+partition checkM3CONo {
+    :facility = Find **TM_M3_FACILITY** WHERE M3Company = 100 AND Facility = :facilityCode;
+    :getM3COStatus: SELECT OACUNO, OAORST, OAORSL FROM OOHEAD A JOIN MITWHL B ON A.OAWHLO = B.MWWHLO
+    WHERE OAORNO = :facility.OriginFacility AND B.MWFACI=:m3cono;
+    note right
+    M3 Database
+    end note
+
+}
+stop
+@enduml
