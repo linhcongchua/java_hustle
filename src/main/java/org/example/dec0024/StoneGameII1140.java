@@ -3,21 +3,23 @@ package org.example.dec0024;
 public class StoneGameII1140 {
 
     public int stoneGameII(int[] piles) {
-        return max(piles, 0, 1);
+        return max(piles, 0, 1, true);
     }
 
-    public int max(int[] piles, int startIndex, int max, boolean flag) {
+    private int max(int[] piles, int startIndex, int max, boolean flag) {
         int gain = 0;
 
         int possibleTake = max * 2;
-        for (int i = 1; i <= possibleTake; i++) {
+        for (int i = 0; i < possibleTake; i++) {
             int endIndex = startIndex + i;
             if (endIndex >= piles.length) {
                 return gain;
             }
-
-
-            gain = Math.max(gain,sum(piles, startIndex, endIndex) + max(piles, endIndex, Math.max(max, i)));
+            if (flag) {
+                gain = Math.max(gain, sum(piles, startIndex, endIndex) + max(piles, endIndex + 1, Math.max(max, i), false));
+            } else {
+                gain = Math.max(gain, max(piles, endIndex + 1, Math.max(max, i), true));
+            }
         }
 
         return gain;

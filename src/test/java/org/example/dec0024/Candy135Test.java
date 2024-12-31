@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class StoneGameII1140Test {
+class Candy135Test {
 
     @Test
     void test1() {
-        StoneGameII1140 test = new StoneGameII1140();
-        assertEquals(10, test.stoneGameII(new int[]{2, 7, 9, 4, 4}));
+        Candy135 test = new Candy135();
+        assertEquals(5, test.candy(new int[]{1, 0, 2}));
     }
 }
